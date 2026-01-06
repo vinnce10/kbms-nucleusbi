@@ -1,0 +1,74 @@
+{
+  "type": "conversation",
+  "id": "1295",
+  "title": "Conversation Title",
+  "created_at": 1663597223,
+  "updated_at": 1663597260,
+  "open": true,
+  "state": "open",
+
+  "source": {
+    "type": "conversation",
+    "id": "3",
+    "delivered_as": "operator_initiated",
+    "subject": "",
+    "body": "<p>Hey there!</p>",
+    "author": {
+      "type": "admin",
+      "id": "274",
+      "name": "Operator",
+      "email": "operator+abcd1234@intercom.io",
+      "from_ai_agent": false,
+      "is_ai_answer": false
+    },
+    "attachments": [],
+    "url": null,
+    "redacted": false
+  },
+
+  "contacts": {
+    "type": "contact.list",
+    "contacts": [
+      {
+        "type": "contact",
+        "id": "5ba682d23d7cf92bef87bfd4",
+        "external_id": "70"
+      }
+    ]
+  },
+
+  "teammates": {
+    "type": "admin.list",
+    "teammates": [
+      {
+        "type": "admin",
+        "id": "274",
+        "name": "Operator",
+        "email": "operator+abcd1234@intercom.io"
+      }
+    ]
+  },
+
+  "conversation_parts": {
+    "type": "conversation_part.list",
+    "conversation_parts": [
+      {
+        "type": "conversation_part",
+        "id": "cp_1",
+        "part_type": "comment",
+        "body": "<p>Okay!</p>",
+        "created_at": 1663597223,
+        "updated_at": 1663597260,
+        "author": {
+          "type": "admin",
+          "id": "274",
+          "name": "Operator",
+          "email": "operator+abcd1234@intercom.io"
+        },
+        "attachments": [],
+        "redacted": false
+      }
+    ],
+    "total_count": 1
+  }
+}
