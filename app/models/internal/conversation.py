@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class InternalParticipant(BaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
-    type: str
+    role: str
     name: Optional[str] = None
     email: Optional[str] = None
 
