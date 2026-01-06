@@ -46,13 +46,12 @@ def _participant_from_author(author: Dict[str, Any]) -> InternalParticipant:
 
 
 def map_intercom_to_internal(payload: IntercomConversationRaw) -> InternalConversation:
-    d = payload.model_dump()  # includes extras because extra="allow"
+    d = payload.model_dump()
 
     external_id = str(d.get("id"))
     created_at = _ts_to_dt(d.get("created_at"))
     updated_at = _ts_to_dt(d.get("updated_at")) if d.get("updated_at") is not None else None
 
-    # --- collect messages ---
     messages: List[InternalMessage] = []
 
     conv_msg = d.get("conversation_message") or {}
@@ -63,7 +62,7 @@ def map_intercom_to_internal(payload: IntercomConversationRaw) -> InternalConver
             InternalMessage(
                 id=str(conv_msg.get("id")) if conv_msg.get("id") is not None else None,
                 author_participant_id=str(conv_msg_author.get("id", "unknown")),
-                sent_at=created_at,  # fallback rule for missing timestamp
+                sent_at=created_at,
                 content=str(conv_msg_body),
             )
         )

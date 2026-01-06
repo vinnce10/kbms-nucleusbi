@@ -66,6 +66,15 @@ class ConversationRepository:
 
         for record in records:
             conversation = InternalConversation.model_validate_json(record["payload_json"])
+
+            last_msg = conversation.messages[-1] if conversation.messages else None
+            last_message_at = last_msg.sent_at if last_msg else None
+
+            last_message_preview = None
+            if last_msg and last_msg.content is not None:
+                text = last_msg.content.strip()
+                last_message_preview = text[:120] if len(text) > 120 else text
+
             items.append(
                 ConversationListItem(
                     id=conversation.id,
@@ -75,6 +84,8 @@ class ConversationRepository:
                     updated_at=conversation.updated_at,
                     participant_count=len(conversation.participants),
                     message_count=len(conversation.messages),
+                    last_message_at=last_message_at,
+                    last_message_preview=last_message_preview,
                 )
             )
             pass

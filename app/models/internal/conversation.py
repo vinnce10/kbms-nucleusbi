@@ -32,19 +32,6 @@ class InternalConversation(BaseModel):
     participants: List[InternalParticipant] = Field(default_factory=list)
     messages: List[InternalMessage] = Field(default_factory=list)
 
-    @classmethod
-    def placeholder(cls, conversation_id: UUID) -> "InternalConversation":
-        now = datetime.now(tz=timezone.utc)
-        return cls(
-            id=conversation_id,
-            provider="intercom",
-            external_id="TODO_EXTERNAL_ID",
-            created_at=now,
-            updated_at=now,
-            participants=[],
-            messages=[],
-        )
-    
 
 class ConversationListItem(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -56,6 +43,9 @@ class ConversationListItem(BaseModel):
     updated_at: Optional[datetime] = None
     participant_count: int
     message_count: int
+
+    last_message_at: Optional[datetime] = None
+    last_message_preview: Optional[str] = None
 
 
 class ConversationListResponse(BaseModel):
