@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from app.models.internal.conversation import ConversationListResponse, InternalConversation
+from app.models.internal.conversation import ConversationListResponse, InternalConversation, ConversationListItem
 import sqlite3
 
 
@@ -60,7 +60,25 @@ class ConversationRepository:
             return conversation.id, False
 
     def list_conversations(self) -> ConversationListResponse:
-        raise NotImplementedError
+        items = []
+        with self._connect() as connection:
+            records = connection.execute("SELECT payload_json FROM conversations ORDER BY created_at DESC").fetchall()
+
+        for record in records:
+            conversation = InternalConversation.model_validate_json(record["payload_json"])
+            items.append(
+                ConversationListItem(
+                    id=conversation.id,
+                    provider=conversation.provider,
+                    external_id=conversation.external_id,
+                    created_at=conversation.created_at,
+                    updated_at=conversation.updated_at,
+                    participant_count=len(conversation.participants),
+                    message_count=len(conversation.messages),
+                )
+            )
+            pass
+        return ConversationListResponse(items=items)
 
     def get_conversation(self, conversation_id: UUID) -> Optional[InternalConversation]:
         raise NotImplementedError
