@@ -1,74 +1,86 @@
 {
   "type": "conversation",
-  "id": "1295",
-  "title": "Conversation Title",
-  "created_at": 1663597223,
-  "updated_at": 1663597260,
+  "id": "1122334455",
+  "created_at": 1567693209,
+  "updated_at": 1568367881,
+  "waiting_since": 1568367881,
+  "snoozed_until": null,
+  "assignee": {
+    "type": "admin",
+    "id": "1223334"
+  },
   "open": true,
   "state": "open",
-
-  "source": {
-    "type": "conversation",
-    "id": "3",
-    "delivered_as": "operator_initiated",
-    "subject": "",
-    "body": "<p>Hey there!</p>",
-    "author": {
-      "type": "admin",
-      "id": "274",
-      "name": "Operator",
-      "email": "operator+abcd1234@intercom.io",
-      "from_ai_agent": false,
-      "is_ai_answer": false
+  "read": true,
+  "tags": {
+    "type": "tag.list",
+    "tags": []
+  },
+  "conversation_rating": {
+    "rating": null,
+    "remark": null,
+    "created_at": null,
+    "customer": {
+      "type": null,
+      "id": null
     },
-    "attachments": [],
-    "url": null,
-    "redacted": false
+    "teammate": {
+      "type": null,
+      "id": null
+    }
   },
-
-  "contacts": {
-    "type": "contact.list",
-    "contacts": [
-      {
-        "type": "contact",
-        "id": "5ba682d23d7cf92bef87bfd4",
-        "external_id": "70"
-      }
-    ]
-  },
-
-  "teammates": {
-    "type": "admin.list",
-    "teammates": [
-      {
-        "type": "admin",
-        "id": "274",
-        "name": "Operator",
-        "email": "operator+abcd1234@intercom.io"
-      }
-    ]
-  },
-
   "conversation_parts": {
     "type": "conversation_part.list",
     "conversation_parts": [
       {
         "type": "conversation_part",
-        "id": "cp_1",
+        "id": "1223445555",
         "part_type": "comment",
-        "body": "<p>Okay!</p>",
-        "created_at": 1663597223,
-        "updated_at": 1663597260,
+        "body": "We've removed this part of the conversation to comply with Twitter's terms and conditions. You can view the complete conversation in Intercom.",
+        "created_at": 1567693273,
+        "updated_at": 1567693273,
+        "notified_at": 1567693273,
+        "assigned_to": null,
         "author": {
-          "type": "admin",
-          "id": "274",
-          "name": "Operator",
-          "email": "operator+abcd1234@intercom.io"
+          "type": "user",
+          "id": "5310d8e7598c9a0b24000002",
+          "name": "",
+          "email": ""
         },
         "attachments": [],
-        "redacted": false
+        "external_id": null
       }
     ],
     "total_count": 1
+  },
+  "customer_first_reply": {
+    "created_at": 1567693209,
+    "type": "twitter",
+    "url": ""
+  },
+  "conversation_message": {
+    "type": "twitter",
+    "id": "409820079",
+    "delivered_as": "customer_initiated",
+    "subject": "We've removed this part of the conversation to comply with Twitter's terms and conditions. You can view the complete conversation in Intercom.",
+    "body": "We've removed this part of the conversation to comply with Twitter's terms and conditions. You can view the complete conversation in Intercom.",
+    "author": {
+      "type": "user",
+      "id": "5310d8e7598c9a0b24000002",
+      "name": "",
+      "email": ""
+    },
+    "attachments": [],
+    "url": ""
+  },
+  "customers": [
+    {
+      "type": "user",
+      "id": "5310d8e7598c9a0b24000002"
+    }
+  ],
+  "user": {
+    "type": "user",
+    "id": "5310d8e7598c9a0b24000002"
   }
 }
