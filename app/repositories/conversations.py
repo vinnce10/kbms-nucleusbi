@@ -81,4 +81,10 @@ class ConversationRepository:
         return ConversationListResponse(items=items)
 
     def get_conversation(self, conversation_id: UUID) -> Optional[InternalConversation]:
+        with self._connect() as connection:
+            record = connection.execute("SELECT payload_json FROM conversations WHERE id=?", (str(conversation_id),),).fetchone()
+
+            if not record:
+                return None
+            return InternalConversation.model_validate_json(record["payload_json"])
         raise NotImplementedError
