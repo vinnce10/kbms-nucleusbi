@@ -100,6 +100,21 @@ Service runs at:
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
+## Running Tests
+
+### With Docker Compose (recommended for demo)
+
+```bash
+docker compose exec kbms sh -lc "cd /app && pytest -q"
+```
+
+### Local (optional)
+```bash
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+pytest -q
+
+```
 
 ---
 
