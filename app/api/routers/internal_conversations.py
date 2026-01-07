@@ -1,6 +1,7 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, status
+from fastapi.responses import JSONResponse
 from app.models.errors import ErrorResponse
 
 from app.models.internal.conversation import ConversationListResponse, InternalConversation
@@ -17,8 +18,10 @@ def list_conversations(request: Request) -> ConversationListResponse:
 def get_conversation(conversation_id: UUID, request: Request) -> InternalConversation:
     conversation = request.app.state.repo.get_conversation(conversation_id)
     if conversation is None:
-        raise HTTPException(
-            status_code=404,
-            detail=ErrorResponse(error_code="not_found", message="Conversation not found", details=None).model_dump(),
+        body = ErrorResponse(
+            error_code="not_found",
+            message="Conversation not found",
+            details=None,
         )
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=body.model_dump())
     return conversation
