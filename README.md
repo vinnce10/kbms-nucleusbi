@@ -54,7 +54,7 @@ A small FastAPI service that ingests conversation payloads from an external prov
 
 ---
 
-## Folder Structure (recommended / current)
+## Folder Structure
 
 ```
 app/
@@ -78,7 +78,11 @@ app/
   services/
     ingestion.py
   main.py
-  
+
+tests/
+  conftest.py
+  test_api.py
+pytest.ini
 ```
 
 ---
@@ -100,20 +104,21 @@ Service runs at:
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
+
+---
+
 ## Running Tests
 
-### With Docker Compose (recommended for demo)
-
+### With Docker Compose
 ```bash
 docker compose exec kbms sh -lc "cd /app && pytest -q"
 ```
 
-### Local (optional)
+### Local
 ```bash
 pip install -r requirements.txt
-pip install -r requirements-dev.txt
+pip install pytest
 pytest -q
-
 ```
 
 ---
@@ -298,12 +303,7 @@ Everything else is tolerated (Intercom is a large schema) via `extra="allow"`.
   "created_at": "2019-09-05T14:20:09Z",
   "updated_at": "2019-09-13T09:44:41Z",
   "participants": [
-    {
-      "id": "5310d8e7598c9a0b24000002",
-      "role": "customer",
-      "name": null,
-      "email": null
-    }
+    { "id": "5310d8e7598c9a0b24000002", "role": "customer", "name": null, "email": null }
   ],
   "messages": [
     {
@@ -337,9 +337,9 @@ Everything else is tolerated (Intercom is a large schema) via `extra="allow"`.
 
 ### Strategy
 - External provider payloads can be large and change over time.
-- We validate a **required subset** that we need for internal analysis:
+- We validate a **required subset** needed for internal analysis:
   - `id`, `created_at`, `conversation_message.body`, `conversation_message.author.id`
-- Everything else is accepted as “extra” using Pydantic v2:
+- Everything else is accepted using:
   - `model_config = ConfigDict(extra="allow")`
 
 ### Error Schema (consistent)
@@ -379,26 +379,33 @@ This makes the ingestion endpoint safe to call multiple times for the same provi
 
 ## How to Add a New Provider Integration
 
-To add a new provider (e.g., Zapier, Zendesk, etc.) without breaking internal consumers:
+To add a new provider (e.g., Zendesk, Zapier, etc.) without breaking internal consumers:
 
-1. **Create external model**
-   - `app/models/external/<provider>.py`
-   - define minimal required subset + `extra="allow"`
-
-2. **Create adapter/mapper**
-   - `app/adapters/<provider>/mapper.py`
-   - implement `<provider> payload → InternalConversation`
-
-3. **Add ingestion router**
-   - `app/api/routers/integrations_<provider>.py`
-   - new endpoint `POST /integrations/<provider>/conversations`
-
-4. **Update service**
-   - add an ingestion method like `ingest_<provider>()` (or generalize via interface)
-
-5. **Mount router**
-   - `app/main.py`: `app.include_router(<provider_router>)`
+1. Create external model: `app/models/external/<provider>.py` (subset required + `extra="allow"`)
+2. Create adapter/mapper: `app/adapters/<provider>/mapper.py` (map payload → `InternalConversation`)
+3. Add ingestion router: `app/api/routers/integrations_<provider>.py`
+4. Extend ingestion service: add `ingest_<provider>()` (or generalize via interface)
+5. Mount router in `app/main.py`
 
 Internal APIs (`/internal/*`) and internal models remain unchanged because all providers map into the same stable `InternalConversation` contract.
 
 ---
+
+## Scalability Notes (within scope)
+
+- **Async ingestion:** return `202 Accepted` and enqueue processing if mapping/enrichment becomes heavy.
+- **Pagination:** add `limit/offset` or cursor pagination for `GET /internal/conversations`.
+- **Indexes:** keep unique `(provider, external_id)`; add index on `created_at` for list sorting/filtering.
+- **Storage evolution:** swap SQLite → Postgres; optionally separate raw payload storage from normalized entities.
+- **Analytics modeling:** normalize messages/participants into separate tables if analytics queries grow.
+- **Idempotency:** keep uniqueness constraints; optionally store provider event IDs / idempotency keys.
+
+---
+
+## Assumptions & Trade-offs
+
+- Only one provider integration is implemented (Intercom), mocked payloads (no real Intercom API calls).
+- No authentication (explicitly out of scope).
+- SQLite chosen for simplicity and portability; repository layer allows switching to Postgres later.
+- External schema validates a minimal subset (`extra="allow"`) to tolerate provider schema drift.
+- Internal schema is strict (`extra="forbid"`) to protect internal consumers with a stable contract.
