@@ -62,6 +62,9 @@ app/
     intercom/
       mapper.py
   api/
+    openapi/
+      examples.py
+      responses.py
     routers/
       integrations_intercom.py
       internal_conversations.py
