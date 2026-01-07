@@ -8,6 +8,11 @@ from app.models.errors import ErrorResponse, FieldError
 
 
 def build_field_errors(exception: RequestValidationError) -> List[FieldError]:
+    """Convert FastAPI/Pydantic validation errors into our stable FieldError schema.
+
+    This keeps error responses consistent for internal consumers and UAT,
+    even if Pydantic error formatting changes over time.
+    """
     field_errors: List[FieldError] = []
 
     for error in exception.errors():
@@ -15,12 +20,16 @@ def build_field_errors(exception: RequestValidationError) -> List[FieldError]:
         msg = error.get("msg", "Validation error")
         error_type = error.get("type", "validation_error")
 
-        # loc looks like: ('body', 'created_at') or ('body','conversation_message','author','id')
-        # Remove leading 'body'
+        # `loc` describes where the error happened, e.g.
+        # - ('body', 'created_at')
+        # - ('body', 'conversation_message', 'author', 'id')
+        # - ('path', 'conversation_id')
+        # We remove the leading 'body' so the path matches the JSON payload shape.
         loc_parts = [str(x) for x in loc if x != "body"]
         field_path = ".".join(loc_parts) if loc_parts else "body"
 
-        # Map error types to simpler issues
+        # Reduce many Pydantic error types into a small, predictable set
+        # that clients/tests can reliably assert on.
         if error_type in ("missing", "value_error.missing"):
             issue = "missing"
         elif "type_error" in error_type:
@@ -30,14 +39,19 @@ def build_field_errors(exception: RequestValidationError) -> List[FieldError]:
         else:
             issue = "invalid"
 
+        # Always include a FieldError item so "details" is consistently structured.
         field_errors.append(FieldError(field=field_path, issue=issue, message=msg))
 
     return field_errors
 
 
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
-    # Detect malformed JSON (FastAPI may encode this as a validation error)
-    # One common signature: err['type'] == 'json_invalid'
+    """Global handler for request validation.
+
+    - 400 when the request body is not valid JSON (malformed JSON)
+    - 422 when JSON is valid but fails schema/type validation
+    """
+    # FastAPI represents malformed JSON as a validation error with type "json_invalid".
     is_json_invalid = any(e.get("type") == "json_invalid" for e in exc.errors())
 
     if is_json_invalid:
@@ -48,7 +62,7 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
         )
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content=body.model_dump())
 
-    # Otherwise: normal 422 validation errors
+    # Standard validation errors: missing required fields, wrong types, invalid formats, etc.
     details = build_field_errors(exc)
     body = ErrorResponse(
         error_code="validation_error",
