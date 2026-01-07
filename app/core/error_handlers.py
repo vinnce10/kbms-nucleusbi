@@ -6,6 +6,7 @@ from starlette.status import HTTP_400_BAD_REQUEST, HTTP_422_UNPROCESSABLE_ENTITY
 
 from app.models.errors import ErrorResponse, FieldError
 
+
 def build_field_errors(exception: RequestValidationError) -> List[FieldError]:
     field_errors: List[FieldError] = []
 
@@ -29,9 +30,10 @@ def build_field_errors(exception: RequestValidationError) -> List[FieldError]:
         else:
             issue = "invalid"
 
-            field_errors.append(FieldError(field=field_path, issue=issue, message=msg))
+        field_errors.append(FieldError(field=field_path, issue=issue, message=msg))
 
     return field_errors
+
 
 async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
     # Detect malformed JSON (FastAPI may encode this as a validation error)
