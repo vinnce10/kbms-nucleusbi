@@ -1,12 +1,17 @@
 from fastapi import APIRouter, Request, Response, status
 from app.models.external.intercom import IntercomConversationRaw
 from app.services.ingestion import IngestResponse, IngestionService
+from app.api.openapi.responses import INGEST_INTERCOM_RESPONSES
 
 
 router = APIRouter(prefix="/integrations/intercom", tags=["integrations"])
 
 
-@router.post("/conversations", response_model=IngestResponse)
+@router.post(
+    "/conversations",
+    response_model=IngestResponse,
+    responses=INGEST_INTERCOM_RESPONSES,
+)
 def ingest_intercom_conversation(payload: IntercomConversationRaw, 
                                  request: Request, 
                                  response: Response,) -> IngestResponse:
